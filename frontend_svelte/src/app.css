@@ -1,0 +1,44 @@
+/* 모든 HTML 요소에 적용 */
+
+@font-face {
+  font-family: "NxMaple"; 
+  /* 사용할 이름 정의 */
+  src: url("lib/assets/Maplestory OTF Light.otf") format("opentype");
+}
+
+main,
+html {
+  margin: 0;
+  padding: 0;
+
+  min-width: 100dvw;
+  min-height: 100dvh;
+  max-width: 100dvw;
+  max-height: 100dvh;
+
+  font-family: "NxMaple";
+  color: white;
+  background-color: #252525;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  /* overflow: hidden; */
+  padding: 0; margin: 0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+button{
+  font-family: "NxMaple";
+  appearance: none;
+  border: none; outline: none;
+  background-color: transparent;
+  color: white;
+  margin: 0; padding: 0;
+  text-align: start;
+}

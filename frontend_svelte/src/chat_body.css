@@ -1,0 +1,39 @@
+#chat_body{
+  width: 100dvw; height: 100dvh;
+  padding: 1rem; overflow-y: scroll;
+  display: flex; 
+  flex-direction: column;
+}
+#chat_body table{
+  border-collapse: collapse;
+  width: 100%;
+}
+#chat_body th, #chat_body td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+#chat_body em{
+  opacity: 0.5;
+  font-size: 0.85rem;
+  font-style: normal;
+}
+#chat_body p {
+  margin: 0; margin-bottom: 1rem;
+}
+/* 코드블럭 */
+#chat_body pre{
+  background: #282c34;
+  color: white;
+  padding: 1rem;
+  border: 0.2rem solid grey;
+  border-radius: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+#chat_body code{
+  width: 100%;
+  /* pre안에서 초과방지 */
+  white-space: pre-wrap;
+}

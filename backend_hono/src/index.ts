@@ -3,6 +3,9 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { models, chat } from "./routes/endpoint";
 
+// 프론트 에러를 동의 없이 수집해도 되는지 알아보기
+import { auto_report } from "./routes/collect";
+
 const app = new Hono();
 
 app.use(
@@ -25,6 +28,8 @@ app.get("/models", models);
 
 // POST
 app.post("/chat", chat);
+
+app.post("/auto_report/:type", auto_report);
 
 export default {
   port: 3000,

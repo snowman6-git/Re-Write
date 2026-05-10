@@ -44,9 +44,24 @@
 	let model_list = $state<ModelInfo[]>([]);
 
 	async function model_listup() {
-		let model_list_api = await axios.get(`${API_URL}/models`);
-		model_list = model_list_api.data;
-		$selectedModel = model_list_api.data[0].id;
+        try {
+            let model_list_api = await axios.get(`${API_URL}/models`, { timeout: 5000 });
+            model_list = model_list_api.data;
+            // 첫 모델을 기본 선택값으로 설정
+			$selectedModel = model_list_api.data[0].id!;
+		} catch (error) {
+			$selectedModel = 'NotFound';
+            
+            // 애초에 버튼이 비활되긴하지만 혹시 몰라서 모델 리스트에 실패 메시지라도 넣어줌
+            model_list.push({ id: 'NotFound', name: '모델 리스트업 실패', desc: '서버에서 모델 정보를 받아오지 못했습니다.' } as ModelInfo);
+            axios.post(`${API_URL}/auto_report/try_catch`, {
+                error: `모델 리스트업 실패: ${error}`,
+                timestamp: new Date().toISOString()
+            }).catch((err) => {
+                console.error('레전드 버그가 나버림', err);
+            });
+            // 모델 리스트가 비어있거나 예상치 못한 형식일 경우 대비
+		}
 	}
 	model_listup();
 
@@ -67,7 +82,7 @@
 		}
 	});
 
-	// 작동은 하는데 뭔지 못알아 처먹었으니 공부하기 대충 백앤드에 오쳥 때리고 응답 바디에 리더걸고 와일로 반복 수락하는거 같은데, 소켓이 더 나은건 아닌지 고민 ㄱ
+	// 작동은 하는데 뭔지 못알아 처먹었으니 공부하기 대충 백앤드에 요청 때리고 응답 바디에 리더걸고 와일로 반복 수정하는거 같은데, 소켓이 더 나은건 아닌지 고민 ㄱ
 	async function chat() {
 		// 1. 유저 메시지 추가
 		const currentInput = user_input;
@@ -119,11 +134,6 @@
 		}
 	}
 
-	// let chat_api = await axios.post(`${API_URL}/chat`, {
-	//     chat: chat,
-	//     model: $selectedModel
-	// }, {})
-
 	function handleGlobalKeyDown(event: KeyboardEvent) {
 		if (event.key === 'Enter') {
 			chat();
@@ -158,7 +168,7 @@
 				<button
 					id="force_menu"
 					onclick={() => ($isModel_menu_open = false)}
-					class:disable={$isModel_menu_open}>a</button
+					class:disable={$isModel_menu_open}></button
 				>
 				{#if $isModel_menu_open}
 					<ModelList {model_list} />

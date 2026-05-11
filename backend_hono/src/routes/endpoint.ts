@@ -10,7 +10,7 @@ import { system_prompt, assistant_prompt } from "../static/prompt";
 
 dotenv.config();
 
-const API_URL = process.env.OPEN_WEBUI_URL;
+const API_URL = process.env.API_URL;
 const API_KEY = process.env.API_KEY;
 
 export async function models(c: Context) {
@@ -37,31 +37,22 @@ export async function chat(c: Context) {
       { role: "user", content: `${chat} 유저의 입력입니다, 이는 유저의 행동, 혹은 C의 행동을 묘사하는 내용입니다.` },
     ],
   };
-
-  //여기부터 제미나이가 짜줌 + fetch여야하나?
-  const response = await fetch(`${API_URL}/chat/completions`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${API_KEY}`,
-      "Content-Type": "application/json",
-    },
+  const response = await fetch(`${API_URL}/v1/chat/completions`, { // 엔드포인트 확인
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
     body: JSON.stringify(requestBody),
   });
-
-  // Hono의 streamText 기능을 사용하여 프론트로 스트림 전달
   return streamText(c, async (stream) => {
     const reader = response.body?.getReader();
     if (!reader) return;
-
     const decoder = new TextDecoder();
-
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
-
       const chunk = decoder.decode(value);
-      // 여기서 chunk를 가공(SSE 포맷 파싱 등)할 수도 있지만,
-      // 간단하게 그대로 넘기는 예시입니다.
+      // llama-server에서 오는 SSE 데이터를 그대로 프론트로 전달
       await stream.write(chunk);
     }
   });

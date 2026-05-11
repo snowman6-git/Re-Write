@@ -7,7 +7,6 @@ import { models, chat } from "./routes/endpoint";
 import { auto_report } from "./routes/collect";
 import { serveStatic } from "hono/bun";
 
-
 const app = new Hono();
 app.use(
   // '*',
@@ -20,7 +19,7 @@ app.use(
     credentials: true,
   }),
 );
-app.use('/*', serveStatic({ root: './public' }))
+app.use("/*", serveStatic({ root: "./public" }));
 
 // GET
 app.get("/", (c) => {

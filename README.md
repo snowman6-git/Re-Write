@@ -21,5 +21,8 @@
 
 업데이트/미리보기
 
-2026.05.11 hono의 staticServe + 프롬프트로 캐릭터 이미지 출력 기능 추가
+2026.05.10 hono의 staticServe + 프롬프트로 캐릭터 이미지 출력 기능 추가
 <img width="629" height="940" alt="image" src="https://github.com/user-attachments/assets/63f3dcc0-0afa-4b33-917f-2a90b33f0501" />
+
+2026.05.11 모델 alias, hardware권장사양용 리턴 오브젝트 리폼
+<img width="633" height="925" alt="Screenshot from 2026-05-11 20-15-34" src="https://github.com/user-attachments/assets/172845bf-4ab6-47db-bd84-147f8743d41c" />

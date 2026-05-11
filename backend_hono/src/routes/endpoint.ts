@@ -24,7 +24,7 @@ export async function models(c: Context) {
 }
 
 export async function chat(c: Context) {
-  const { chat, model } = await c.req.json();
+  const { chat, model, custom_note } = await c.req.json();
   const requestBody = {
     model: model,
     max_tokens: 1200,
@@ -32,9 +32,9 @@ export async function chat(c: Context) {
     temperature: 1.2,
     stream: true, // 반드시 true로 설정
     messages: [
-      { role: "system", content: system_prompt },
+      { role: "system", content: `${system_prompt}\n${custom_note}` },
       { role: "assistant", content: assistant_prompt },
-      { role: "user", content: chat },
+      { role: "user", content: `${chat} 유저의 입력입니다, 이는 유저의 행동, 혹은 C의 행동을 묘사하는 내용입니다.` },
     ],
   };
 

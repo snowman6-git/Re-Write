@@ -5,9 +5,10 @@ import { models, chat } from "./routes/endpoint";
 
 // 프론트 에러를 동의 없이 수집해도 되는지 알아보기
 import { auto_report } from "./routes/collect";
+import { serveStatic } from "hono/bun";
+
 
 const app = new Hono();
-
 app.use(
   // '*',
   cors({
@@ -19,6 +20,7 @@ app.use(
     credentials: true,
   }),
 );
+app.use('/*', serveStatic({ root: './public' }))
 
 // GET
 app.get("/", (c) => {

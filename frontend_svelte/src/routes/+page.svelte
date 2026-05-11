@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { isModel_menu_open, selectedModel } from '../menu_store';
+	import { isModel_menu_open, selectedModel, isModel_loaded } from '../menu_store';
 	import axios from 'axios';
 	// 외부 라이브러리
 	import { marked } from 'marked';
@@ -8,15 +8,15 @@
 	import '../chat_body.css';
 
 	// 하이라이팅 라이브러리
-	import hljs from 'highlight.js/lib/core';
-	import bash from 'highlight.js/lib/languages/bash';
-	import diff from 'highlight.js/lib/languages/diff';
-	// hljs 사용할 언어 등록
-	hljs.registerLanguage('bash', bash);
-	hljs.registerLanguage('diff', diff);
+	// import hljs from 'highlight.js/lib/core';
+	// import bash from 'highlight.js/lib/languages/bash';
+	// import diff from 'highlight.js/lib/languages/diff';
+	// // hljs 사용할 언어 등록
+	// hljs.registerLanguage('bash', bash);
+	// hljs.registerLanguage('diff', diff);
 
 	// Custom Data
-	import { markdownContent } from '../../static/markdown.ts';
+	// import { markdownContent } from '../../static/markdown.ts';
 
 	// 컴포넌트
 	import ModelList from '../components/ModelList.svelte';
@@ -30,10 +30,6 @@
 		content: string;
 	}
 	let user_input = $state('');
-	// 상태에 인터페이스 추가로 변수들의 타입추론 지원(걍 빨간줄 지워줌 없어도 문제는 X 있음 기분좋아.)
-	// let MsgBox = $state<Msg[]>([
-	//     // {from: "ai", content: `${markdownContent}`}
-	// ])
 	let MsgBox: Msg[] = $state([]);
 
 	interface ModelInfo {
@@ -45,13 +41,15 @@
 
 	async function model_listup() {
         try {
-            let model_list_api = await axios.get(`${API_URL}/models`, { timeout: 5000 });
+            let model_list_api = await axios.get(`${API_URL}/models`, { timeout: 5000 })
             model_list = model_list_api.data;
             // 첫 모델을 기본 선택값으로 설정
-			$selectedModel = model_list_api.data[0].id!;
-		} catch (error) {
+
+            $selectedModel = model_list_api.data[0].id!;
+            $isModel_loaded = true;
+    } catch (error) {
 			$selectedModel = 'NotFound';
-            
+
             // 애초에 버튼이 비활되긴하지만 혹시 몰라서 모델 리스트에 실패 메시지라도 넣어줌
             model_list.push({ id: 'NotFound', name: '모델 리스트업 실패', desc: '서버에서 모델 정보를 받아오지 못했습니다.' } as ModelInfo);
             axios.post(`${API_URL}/auto_report/try_catch`, {
@@ -63,11 +61,10 @@
             // 모델 리스트가 비어있거나 예상치 못한 형식일 경우 대비
 		}
 	}
-	model_listup();
 
 	let chat_body: HTMLDivElement;
-
 	// 안봐도 나중에 최적화가 필요한 WWW
+    // 인풋에도 해당 기능 주기
 	$effect(() => {
 		// messages 배열의 내용이 바뀌는 것을 Svelte가 감지합니다.
 		MsgBox.map((m) => m.content);
@@ -97,7 +94,7 @@
 		const response = await fetch(`${API_URL}/chat`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ chat: currentInput, model: $selectedModel })
+			body: JSON.stringify({ chat: currentInput, model: $selectedModel, custom_note: "IMG_LOGIC URL을 http://localhost:3000/img로 변경" })
 		});
 
 		const reader = response.body?.getReader();
@@ -191,9 +188,14 @@
 			<!-- {@html msg.content} -->
 		{/each}
 	</div>
-	<div id="chat_input">
-		<input id="user_input" type="text" placeholder="텍스트 입력" bind:value={user_input} />
-	</div>
+    <div id="chat_input">
+
+    {#if $isModel_loaded}
+        <input id="user_input" type="text" placeholder="텍스트 입력" bind:value={user_input} />
+    {:else}
+        <input id="user_input" type="text" placeholder="모델로드중..." bind:value={user_input} disabled />
+    {/if}
+    </div>
 </div>
 
 <style>

@@ -18,3 +18,8 @@
 아이디어만 많고 실력이 조악해 코드 잘 짜시는 분들은 눈돌리시는걸 추천합니다.
 
 ### 목표는 로컬ai or API사서 자급자족 가능한 셀프 호스팅 + 프롬프트 연습용 GUI만들기가 되겠습니다.
+
+업데이트/미리보기
+
+2026.05.11 hono의 staticServe + 프롬프트로 캐릭터 이미지 출력 기능 추가
+<img width="629" height="940" alt="image" src="https://github.com/user-attachments/assets/63f3dcc0-0afa-4b33-917f-2a90b33f0501" />

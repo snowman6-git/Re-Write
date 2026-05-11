@@ -1,0 +1,8 @@
+// src/constants.ts
+export const MODEL_DISPLAY_CONFIG: Record<string, { aliases: string; desc: string; hardware: string }> = {
+  "model.id": {
+    aliases: "model.aliases",
+    desc: "model.desc",
+    hardware: "model.hardware"
+  }
+};

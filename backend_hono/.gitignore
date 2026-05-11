@@ -1,5 +1,7 @@
 # deps
 node_modules/
 .env
-prompt.ts
 public/img/*
+
+src/static/prompt.ts
+src/static/model.ts

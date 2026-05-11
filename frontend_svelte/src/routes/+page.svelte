@@ -45,7 +45,7 @@
             model_list = model_list_api.data;
             // 첫 모델을 기본 선택값으로 설정
 
-            $selectedModel = model_list_api.data[0].id!;
+            $selectedModel = model_list_api.data[0];
             $isModel_loaded = true;
     } catch (error) {
 			$selectedModel = 'NotFound';
@@ -94,7 +94,7 @@
 		const response = await fetch(`${API_URL}/chat`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ chat: currentInput, model: $selectedModel, custom_note: "IMG_LOGIC URL을 http://localhost:3000/img로 변경" })
+			body: JSON.stringify({ chat: currentInput, model: $selectedModel.id, custom_note: "IMG_LOGIC URL을 http://localhost:3000/img로 변경" })
 		});
 
 		const reader = response.body?.getReader();
@@ -152,17 +152,18 @@
 
 <div id="main">
 	<div id="header">
-		<!-- <div>back</div> -->
-		<!-- <div>title</div> -->
+		<div>back</div>
+		<div>title</div>
 
 		<div id="header_right">
 			<div>
 				{#await model_listup()}
 					<button id="model_menu_btn" disabled>Loading...</button>
 				{:then}
-					<button id="model_menu_btn" onclick={open_model_menu}>{$selectedModel}</button>
+					<button id="model_menu_btn" onclick={open_model_menu}>{$selectedModel.name}</button>
 				{/await}
 				<button
+                    title=""
 					id="force_menu"
 					onclick={() => ($isModel_menu_open = false)}
 					class:disable={$isModel_menu_open}></button
@@ -179,9 +180,9 @@
 			<!-- 잠깐만 구분선용으로 쓰기 -->
 			<div style="opacity: 0.5; font-size: 0.8rem; font-weight: bold;">[{msg.from}]</div>
 			{@html marked(DOMPurify.sanitize(msg.content))}
-
 			<!-- 비정제 HTML marked가 스타일링함 -->
-			<!-- {marked(msg.content)} -->
+
+            <!-- {msg.content} -->
 
 			<!-- 테스트용 -->
 			<!-- {msg.content} -->

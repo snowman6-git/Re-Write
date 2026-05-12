@@ -10,9 +10,9 @@ import { system_prompt, assistant_prompt } from "../static/prompt";
 import { MODEL_DISPLAY_CONFIG } from "../static/model";
 
 dotenv.config();
-
 const API_URL = process.env.API_URL;
 const API_KEY = process.env.API_KEY;
+
 export async function models(c: Context) {
   let models_api = await axios.get(`${API_URL}/models`, {
     headers: {
@@ -20,15 +20,18 @@ export async function models(c: Context) {
       "Content-Type": "application/json",
     },
   });
-  console.log(models_api.data.data);
-  const reform_model_list = models_api.data.data.map(model => {
+  let models_api_data = models_api.data.data;
+  
+  const reform_model_list = models_api_data.map(model => {
   // 1. 매핑 테이블에서 해당 모델용 정보를 가져옴
   const config = MODEL_DISPLAY_CONFIG[model.id];
   // 2. 새로운 객체를 반환 (이게 포인트!)
   return {
-    ...model, // 기존에 있던 id, created 등 모든 필드를 복사
+    // ...model, // 기존에 있던 id, created 등 모든 필드를 복사 < 가는게 너무 많음
+    id: model.id, // 모델명은 기존 id로 설정
     name: config?.aliases ?? model.id,
     desc: config?.desc ?? "설명 없음",
+    status: model.status.value, // 메모리에 올라왔는가
     hardware: config?.hardware ?? "권장사양없음"
   };
   });
@@ -39,10 +42,16 @@ export async function chat(c: Context) {
   const { chat, model, custom_note } = await c.req.json();
   const requestBody = {
     model: model,
-    max_tokens: 1200,
+    // Advance parameters
     min_p: 0.5,
     temperature: 1.2,
+    // token
+    max_tokens: 2000,
+    thinking_budget_tokens: 560,
+    // streaming
     stream: true, // 반드시 true로 설정
+    is_input: true,
+    enable_thinking: true,
     messages: [
       { role: "system", content: `${system_prompt}\n${custom_note}` },
       { role: "assistant", content: assistant_prompt },

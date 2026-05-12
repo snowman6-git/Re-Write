@@ -20,7 +20,9 @@
 
 	// 컴포넌트
 	import ModelList from '../components/ModelList.svelte';
+	import BackBtn from '../components/BackBtn.svelte';
 	import { tick } from 'svelte';
+	import HamMenu from '../components/HamMenu.svelte';
 
 	// 차차 엔브넣고 최적화 하기
 	const API_URL = 'http://localhost:3000';
@@ -36,6 +38,7 @@
 		id: string;
 		name: string;
 		desc: string;
+		status: string
 	}
 	let model_list = $state<ModelInfo[]>([]);
 
@@ -43,9 +46,8 @@
         try {
             let model_list_api = await axios.get(`${API_URL}/models`, { timeout: 5000 })
             model_list = model_list_api.data;
-            // 첫 모델을 기본 선택값으로 설정
-
-            $selectedModel = model_list_api.data[0];
+            // 로딩된 모델을 기본 선택값으로 설정(차후 소켓이든 뭐든 동적업데이트 < 아님 걍 챗 요청하고 돌아오는 응답으로 로드여부 확인 차피 1개만로드함)
+            $selectedModel = model_list.find((model) => model.status === 'loaded');
             $isModel_loaded = true;
     } catch (error) {
 			$selectedModel = 'NotFound';
@@ -62,7 +64,7 @@
 		}
 	}
 
-	let chat_body: HTMLDivElement;
+    let chat_body: HTMLDivElement;
 	// 안봐도 나중에 최적화가 필요한 WWW
     // 인풋에도 해당 기능 주기
 	$effect(() => {
@@ -130,7 +132,6 @@
 			}
 		}
 	}
-
 	function handleGlobalKeyDown(event: KeyboardEvent) {
 		if (event.key === 'Enter') {
 			chat();
@@ -152,9 +153,11 @@
 
 <div id="main">
 	<div id="header">
-		<div>back</div>
-		<div>title</div>
 
+		<div id="header_left">
+            <BackBtn />
+            <div id="title">TODO리스트는아직인가요?</div>
+        </div>
 		<div id="header_right">
 			<div>
 				{#await model_listup()}
@@ -171,8 +174,11 @@
 				{#if $isModel_menu_open}
 					<ModelList {model_list} />
 				{/if}
+
 			</div>
-			<!-- <button id="side_menu" onclick={alert("menu")}></button> -->
+            <HamMenu />
+
+            <!-- <button id="side_menu" onclick={alert("menu")}></button> -->
 		</div>
 	</div>
 	<div id="chat_body" bind:this={chat_body}>
@@ -231,22 +237,30 @@
 		border-bottom: 0.1rem solid gray;
 		display: flex;
 		align-items: center;
-		justify-content: space-between;
+		/* justify-content: space-around; */
 	}
-	#header_right {
+	#header_right, #header_left {
+        width: 100%; height: 100%;
 		display: flex;
 		flex-direction: row;
-		justify-content: center;
 		align-items: center;
-		gap: 1rem;
+		gap: 0.5rem;
 	}
+    #title{
+        height: auto; width: 20rem;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+    #header_right {
+        justify-content: end;
+    }
+    #header_left {
+        font-size: 1.25rem;
+        font-weight: bold;
+        justify-content: start;
+    }
 
-	#side_menu {
-		background-color: red;
-		height: 100%;
-		aspect-ratio: 1 / 1;
-		background-image: url('../lib/assets/h_menu.svg');
-	}
 
 	#model_menu_btn {
 		background-color: transparent;
@@ -274,5 +288,6 @@
 		outline: none;
 		font-size: 1.2rem;
 		color: white;
+        z-index: 998;
 	}
 </style>

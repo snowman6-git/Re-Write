@@ -1,14 +1,19 @@
 <script lang="ts">
 	import { fly } from 'svelte/transition';
-	import { backOut } from 'svelte/easing';
+	import { cubicOut } from 'svelte/easing';
 	import ModelBlock from './ModelBlock.svelte';
 	let { model_list } = $props<{
 		model_list: object;
 	}>();
+	let menuHeight = $state(0);
 </script>
 
-<!-- 덜컹효과 = backout -->
-<div id="model_menu" transition:fly={{ y: 100, duration: 250, easing: backOut }}>
+<!-- 덜컹효과 = cubicOut -->
+<div id="model_menu" 
+	// 모델 메뉴의 높이를 측정하여 애니메이션에 활용
+	bind:clientHeight={menuHeight}
+	transition:fly={{ y: menuHeight, duration: 200, easing: cubicOut }}
+	>
 	<div id="model_list">
 		{#each model_list as model (model.id)}
 			<ModelBlock {model} />

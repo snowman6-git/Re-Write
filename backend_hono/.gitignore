@@ -5,3 +5,6 @@ public/img/*
 
 src/static/prompt.ts
 src/static/model.ts
+/src/generated/prisma
+
+/src/generated/prisma

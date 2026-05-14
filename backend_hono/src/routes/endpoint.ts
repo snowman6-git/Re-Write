@@ -21,7 +21,6 @@ export async function models(c: Context) {
     },
   });
   let models_api_data = models_api.data.data;
-  
   const reform_model_list = models_api_data.map(model => {
   // 1. 매핑 테이블에서 해당 모델용 정보를 가져옴
   const config = MODEL_DISPLAY_CONFIG[model.id];
@@ -31,7 +30,7 @@ export async function models(c: Context) {
     id: model.id, // 모델명은 기존 id로 설정
     name: config?.aliases ?? model.id,
     desc: config?.desc ?? "설명 없음",
-    status: model.status.value, // 메모리에 올라왔는가
+    status: model.status.value, // 메모리에 올라왔는가, 없는경우도 있으니 ?? <
     hardware: config?.hardware ?? "권장사양없음"
   };
   });
@@ -40,6 +39,7 @@ export async function models(c: Context) {
 
 export async function chat(c: Context) {
   const { chat, model, custom_note } = await c.req.json();
+  
   const requestBody = {
     model: model,
     // Advance parameters
@@ -54,10 +54,12 @@ export async function chat(c: Context) {
     enable_thinking: true,
     messages: [
       { role: "system", content: `${system_prompt}\n${custom_note}` },
-      { role: "assistant", content: assistant_prompt },
+      { role: "assistant", content: `${assistant_prompt}` },
       { role: "user", content: `${chat} 유저의 입력입니다, 이는 유저의 행동, 혹은 C의 행동을 묘사하는 내용입니다.` },
     ],
   };
+
+
   const response = await fetch(`${API_URL}/v1/chat/completions`, { // 엔드포인트 확인
   method: "POST",
   headers: {

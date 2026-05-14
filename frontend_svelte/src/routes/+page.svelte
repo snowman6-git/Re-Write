@@ -47,11 +47,11 @@
             let model_list_api = await axios.get(`${API_URL}/models`, { timeout: 5000 })
             model_list = model_list_api.data;
             // 로딩된 모델을 기본 선택값으로 설정(차후 소켓이든 뭐든 동적업데이트 < 아님 걍 챗 요청하고 돌아오는 응답으로 로드여부 확인 차피 1개만로드함)
-            $selectedModel = model_list.find((model) => model.status === 'loaded');
-            $isModel_loaded = true;
+			// -> 로드된 모델 없으면 일단 리스트의 첫번째 모델로 설정, 그래도 없으면 NotFound
+			$selectedModel = model_list.find((model) => model.status === 'loaded') ?? model_list[0]
+			$isModel_loaded = true;
     } catch (error) {
 			$selectedModel = 'NotFound';
-
             // 애초에 버튼이 비활되긴하지만 혹시 몰라서 모델 리스트에 실패 메시지라도 넣어줌
             model_list.push({ id: 'NotFound', name: '모델 리스트업 실패', desc: '서버에서 모델 정보를 받아오지 못했습니다.' } as ModelInfo);
             axios.post(`${API_URL}/auto_report/try_catch`, {
@@ -134,7 +134,7 @@
 	}
 	function handleGlobalKeyDown(event: KeyboardEvent) {
 		if (event.key === 'Enter') {
-			chat();
+			// chat();
 		}
 	}
 	function open_model_menu() {
@@ -198,9 +198,9 @@
     <div id="chat_input">
 
     {#if $isModel_loaded}
-        <input id="user_input" type="text" placeholder="텍스트 입력" bind:value={user_input} />
+    	<textarea id="user_input" placeholder="텍스트 입력" bind:value={user_input}></textarea>    
     {:else}
-        <input id="user_input" type="text" placeholder="모델로드중..." bind:value={user_input} disabled />
+    	<textarea id="user_input" placeholder="불러오는중..." bind:value={user_input}></textarea>    
     {/if}
     </div>
 </div>
@@ -269,17 +269,18 @@
 		color: white;
 		font-size: 1rem;
 	}
-
 	#chat_input {
 		width: 80%;
-		height: 4rem;
+		height: 20rem;
 		border: 0.2rem solid gray;
 		border-radius: 0.5rem;
 		margin-bottom: 2rem;
-		padding: 0.25rem 1rem 0.25rem 1rem;
+		/* padding: 0.25rem 1rem 0.25rem 1rem; */
+		padding: 1rem;
 		background-color: #252525;
 	}
 	#user_input {
+		resize: none;
 		font-family: 'NxMaple';
 		width: 100%;
 		height: 100%;

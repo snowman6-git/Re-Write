@@ -4,7 +4,6 @@
 	// 외부 라이브러리
 	import { marked } from 'marked';
 	import DOMPurify from 'dompurify';
-
 	import '../chat_body.css';
 
 	// 하이라이팅 라이브러리
@@ -23,6 +22,8 @@
 	import BackBtn from '../components/BackBtn.svelte';
 	import { tick } from 'svelte';
 	import HamMenu from '../components/HamMenu.svelte';
+	import ChatTools from '../components/ChatTools.svelte';
+	import { logic_plus } from '../api_options';
 
 	// 차차 엔브넣고 최적화 하기
 	const API_URL = 'http://localhost:3000';
@@ -83,6 +84,7 @@
 
 	// 작동은 하는데 뭔지 못알아 처먹었으니 공부하기 대충 백앤드에 요청 때리고 응답 바디에 리더걸고 와일로 반복 수정하는거 같은데, 소켓이 더 나은건 아닌지 고민 ㄱ
 	async function chat() {
+		if (user_input.trim() === '') return; // 빈 입력 방지
 		// 1. 유저 메시지 추가
 		const currentInput = user_input;
 		MsgBox = [...MsgBox, { from: 'user', content: currentInput }];
@@ -92,11 +94,16 @@
 		// 이 시점에서 MsgBox의 마지막 인덱스가 AI의 메시지 위치가 됩니다.
 		MsgBox = [...MsgBox, { from: 'Re:Write_AI', content: '' }];
 		const aiMsgIndex = MsgBox.length - 1;
-
 		const response = await fetch(`${API_URL}/chat`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ chat: currentInput, model: $selectedModel.id, custom_note: "IMG_LOGIC URL을 http://localhost:3000/img로 변경" })
+			body: JSON.stringify(
+				{ 
+					chat: currentInput, 
+					model: $selectedModel.id, 
+					custom_note: "IMG_LOGIC URL을 http://localhost:3000/img로 변경",
+					logic_plus: $logic_plus
+				})
 		});
 
 		const reader = response.body?.getReader();
@@ -133,8 +140,10 @@
 		}
 	}
 	function handleGlobalKeyDown(event: KeyboardEvent) {
-		if (event.key === 'Enter') {
-			// chat();
+		// 쉬프트 엔터면 패스하기
+		if (event.key === 'Enter'&& !event.shiftKey) {
+			chat();
+			event.preventDefault();
 		}
 	}
 	function open_model_menu() {
@@ -196,13 +205,13 @@
 		{/each}
 	</div>
     <div id="chat_input">
-
-    {#if $isModel_loaded}
-    	<textarea id="user_input" placeholder="텍스트 입력" bind:value={user_input}></textarea>    
-    {:else}
-    	<textarea id="user_input" placeholder="불러오는중..." bind:value={user_input}></textarea>    
-    {/if}
-    </div>
+		{#if $isModel_loaded}
+			<textarea id="user_input" placeholder="텍스트 입력" bind:value={user_input}></textarea>
+		{:else}
+			<textarea id="user_input" placeholder="불러오는중..." bind:value={user_input}></textarea>    
+		{/if}
+		<ChatTools user_input={user_input} chat={chat}/>
+	</div>
 </div>
 
 <style>
@@ -261,7 +270,6 @@
         justify-content: start;
     }
 
-
 	#model_menu_btn {
 		background-color: transparent;
 		border: 0.2rem solid grey;
@@ -272,11 +280,14 @@
 	#chat_input {
 		width: 80%;
 		height: 20rem;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-around;
 		border: 0.2rem solid gray;
 		border-radius: 0.5rem;
 		margin-bottom: 2rem;
 		/* padding: 0.25rem 1rem 0.25rem 1rem; */
-		padding: 1rem;
+		padding: 0.5em;
 		background-color: #252525;
 	}
 	#user_input {

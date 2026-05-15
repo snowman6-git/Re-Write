@@ -11,7 +11,7 @@
 </button>
 
 {#if isHammenu_open}
-	
+	<div id="overlay" onclick={() => isHammenu_open = false}></div>
 	<div id="side_menu" transition:fly={{ x: 100, duration: 200, easing: cubicOut }}>
 		
 		<div id="header">
@@ -29,10 +29,14 @@
 
 
 <style>
+	#overlay{
+		position: fixed;
+		top: 0; left: 0;
+		width: 100vw; height: 100vh;
+	}
 	button {
 		width: auto; height: 100%;
 		aspect-ratio: 1/1;
-		filter: invert(100);
 		background-position: center;
 		background-size: 80%;
 		background-repeat: no-repeat;

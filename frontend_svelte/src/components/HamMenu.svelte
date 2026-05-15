@@ -60,11 +60,16 @@
 	}
 	#side_menu {
 		padding: 1rem;
-		width: 30dvw; height: 100dvh;
+		width: 30rem; height: 100dvh;
 		backdrop-filter: blur(0.2rem);
 		background-color: rgba(0, 0, 0, 0.65);
 		position: fixed;
 		z-index: 999;
 		top: 0; right: 0;
 	}
+	@media (max-width: 900px) {
+    #side_menu {
+		width: 100dvw;
+    }
+  }
 </style>

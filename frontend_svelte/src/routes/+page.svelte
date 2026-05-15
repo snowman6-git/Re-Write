@@ -270,13 +270,17 @@
         font-weight: bold;
         justify-content: start;
     }
-
 	#model_menu_btn {
+		width: 12rem; height: 2rem;
+		text-align: center;
+		text-wrap: nowrap;
+		overflow: hidden;
 		background-color: transparent;
 		border: 0.2rem solid grey;
 		padding: 0.25rem;
 		color: white;
 		font-size: 1rem;
+		text-overflow: ellipsis;
 	}
 	#chat_input {
 		width: 80%;

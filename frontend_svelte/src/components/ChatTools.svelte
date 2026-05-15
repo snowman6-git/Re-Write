@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { logic_plus } from "../api_options";
-	let { user_input, chat } = $props<{
+	let { user_input, chat, isModelResponding } = $props<{
 		user_input: string;
-		chat: () => Promise<void>
+		chat: () => Promise<void>;
+		isModelResponding: boolean;
 	}>();
 </script>
 		
@@ -12,7 +13,9 @@
 		<button id="logic_plus_btn" onclick={() => $logic_plus = !$logic_plus}>Logic+</button>
 	</label>
 	<!-- 리턴이 없는 보이드 함수라 이런식 -->
-	<button class:active={user_input.trim() !== ''} title="send" id="send_btn" onclick={() => chat()}></button>
+
+	<!-- 유저인풋도 있고, 모델이 응답도 안할때 활성화  -->
+	<button class:active={user_input.trim() !== '' && !isModelResponding} disabled={!isModelResponding} title="send" id="send_btn" onclick={() => chat()}></button>
 </div>
 
 <style>

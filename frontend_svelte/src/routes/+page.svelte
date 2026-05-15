@@ -28,14 +28,13 @@
 
 	// 차차 엔브넣고 최적화 하기
 	const API_URL = 'http://localhost:3000';
-
+	
+	// primary key가 필요함, 아니면 같은 말은 같은 키로 인식해서 업데이트가 안됨
 	interface Msg {
+		id: string;
 		from: string;
 		content: string;
 	}
-	let user_input = $state('');
-	let MsgBox: Msg[] = $state([]);
-
 	interface ModelInfo {
 		id: string;
 		name: string;
@@ -43,7 +42,11 @@
 		status: string
 	}
 	let model_list = $state<ModelInfo[]>([]);
+	let user_input = $state('');
+	let MsgBox: Msg[] = $state([]);
 
+	// 스토어는 이제 구식이라네.
+	let { isModelResponding = $bindable(false) } = $props<{ isModelResponding: boolean }>();
 	async function model_listup() {
         try {
             let model_list_api = await axios.get(`${API_URL}/models`, { timeout: 5000 })
@@ -85,15 +88,17 @@
 
 	// 작동은 하는데 뭔지 못알아 처먹었으니 공부하기 대충 백앤드에 요청 때리고 응답 바디에 리더걸고 와일로 반복 수정하는거 같은데, 소켓이 더 나은건 아닌지 고민 ㄱ
 	async function chat() {
-		if (user_input.trim() === '') return; // 빈 입력 방지
+		// 빈채팅이거나, 모델이 응답중이면 씹기
+		if (user_input.trim() === '' || isModelResponding) return; // 빈 입력 방지
+		isModelResponding = true; // 모델이 응답 중임을 표시
 		// 1. 유저 메시지 추가
 		const currentInput = user_input;
-		MsgBox = [...MsgBox, { from: 'user', content: currentInput }];
+		MsgBox = [...MsgBox, { id:crypto.randomUUID(), from: 'user', content: currentInput }];
 		user_input = '';
 
 		// 2. AI 메시지 공간 미리 생성 (빈 내용으로 추가)
 		// 이 시점에서 MsgBox의 마지막 인덱스가 AI의 메시지 위치가 됩니다.
-		MsgBox = [...MsgBox, { from: 'Re:Write_AI', content: '' }];
+		MsgBox = [...MsgBox, { id:crypto.randomUUID(), from: 'Re:Write_AI', content: '' }];
 		const aiMsgIndex = MsgBox.length - 1;
 		const response = await fetch(`${API_URL}/chat`, {
 			method: 'POST',
@@ -139,6 +144,7 @@
 				}
 			}
 		}
+		isModelResponding = false; // 모델 응답 완료 표시
 	}
 	function handleGlobalKeyDown(event: KeyboardEvent) {
 		// 쉬프트 엔터면 패스하기
@@ -192,7 +198,7 @@
 		</div>
 	</div>
 	<div id="chat_body" bind:this={chat_body}>
-		{#each MsgBox as msg (msg.content)}
+		{#each MsgBox as msg (msg.id)}
 			<!-- 잠깐만 구분선용으로 쓰기 -->
 			<div style="opacity: 0.5; font-size: 0.8rem; font-weight: bold;">[{msg.from}]</div>
 			{@html marked(DOMPurify.sanitize(msg.content))}
@@ -211,7 +217,7 @@
 		{:else}
 			<textarea id="user_input" placeholder="불러오는중..." bind:value={user_input}></textarea>    
 		{/if}
-		<ChatTools user_input={user_input} chat={chat}/>
+		<ChatTools  user_input={user_input} chat={chat} isModelResponding={isModelResponding}/>
 	</div>
 </div>
 

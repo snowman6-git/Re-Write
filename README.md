@@ -29,5 +29,5 @@
 
 
 2026.05.15 Logic+ (Reasoning) 켜고 끄기 추가 (문제는 틀렸지만, TASK따르는것과, <|think> 시간동안 딜레이가 있는걸 볼 수 있음)
-![](https://github.com/user-attachments/assets/b445f8db-1ffc-4986-b4c5-7b0dc910a13a)
+![영상](https://github.com/user-attachments/assets/b445f8db-1ffc-4986-b4c5-7b0dc910a13a)
 

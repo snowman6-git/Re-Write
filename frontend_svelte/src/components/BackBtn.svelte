@@ -11,7 +11,6 @@
 	button{
 		height: 100%; width: auto;
 		aspect-ratio: 1/1;
-		filter: invert(100);
 		background-position: center;
 		background-size: 60%;
 		background-repeat: no-repeat;

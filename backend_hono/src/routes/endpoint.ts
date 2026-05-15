@@ -38,7 +38,15 @@ export async function models(c: Context) {
 }
 
 export async function chat(c: Context) {
-  const { chat, model, custom_note } = await c.req.json();
+  const { chat, model, custom_note, logic_plus } = await c.req.json();
+  
+  // 초기화 하고 리턴에서 참조가능하게 상위변수 지정
+  let thinking_tokens = 0
+  if (logic_plus == false) {
+    thinking_tokens = 0;
+  } else {
+    thinking_tokens = 560;
+  }
   
   const requestBody = {
     model: model,
@@ -47,11 +55,11 @@ export async function chat(c: Context) {
     temperature: 1.2,
     // token
     max_tokens: 2000,
-    thinking_budget_tokens: 560,
+    thinking_budget_tokens: thinking_tokens,
     // streaming
     stream: true, // 반드시 true로 설정
     is_input: true,
-    enable_thinking: true,
+    // enable_thinking: true, 제대로 되는건지 모르겠음.
     messages: [
       { role: "system", content: `${system_prompt}\n${custom_note}` },
       { role: "assistant", content: `${assistant_prompt}` },

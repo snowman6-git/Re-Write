@@ -6,6 +6,7 @@
 	import DOMPurify from 'dompurify';
 	import '../chat_body.css';
 
+
 	// 하이라이팅 라이브러리
 	// import hljs from 'highlight.js/lib/core';
 	// import bash from 'highlight.js/lib/languages/bash';
@@ -301,5 +302,10 @@
 		font-size: 1.2rem;
 		color: white;
         z-index: 998;
+	}
+	@media (max-width: 900px) {
+		#chat_input {
+			width: 90dvw;
+		}
 	}
 </style>

@@ -42,7 +42,7 @@
 		status: string
 	}
 	let model_list = $state<ModelInfo[]>([]);
-	let user_input = $state('');
+	let user_input = $state<string>('');
 	let MsgBox: Msg[] = $state([]);
 
 	// 스토어는 이제 구식이라네.
@@ -112,7 +112,8 @@
 				{	
 					id: user_chat_id,
 					chat: currentInput, 
-					model: $selectedModel.id, 
+					model: $selectedModel.id,
+					// 나중에 사이드메뉴에서 커스텀노트, 이미지 URL같이 다른 옵션 추가하기
 					custom_note: "IMG_LOGIC URL을 http://localhost:3000/img로 변경",
 					logic_plus: $logic_plus
 				})
@@ -126,27 +127,13 @@
 		while (true) {
 			const { done, value } = await reader.read();
 			if (done) break;
-
-			const chunk = decoder.decode(value);
-			const lines = chunk.split('\n');
-
-			for (const line of lines) {
-				// Open-WebUI/OpenAI 특유의 SSE 데이터 포맷 처리 [cite: 12]
-				if (line.startsWith('data: ') && line !== 'data: [DONE]') {
-					try {
-						const jsonStr = line.slice(6);
-						const data = JSON.parse(jsonStr);
-						const content = data.choices[0].delta?.content || '';
-
-						// 3. 기존 틀 유지: 특정 인덱스의 content만 누적 업데이트 [cite: 11]
-						MsgBox[aiMsgIndex].content += content;
-
-						// Svelte 반응성 트리거: 배열을 재할당해야 UI가 갱신됩니다.
-						MsgBox = [...MsgBox];
-					} catch (e) {
-						// 불완전한 JSON 데이터가 들어올 경우 대비
-						continue;
-					}
+			for (const line of decoder.decode(value)) {
+				try {
+					MsgBox[aiMsgIndex].content += line;
+					MsgBox = [...MsgBox];
+				} catch (e) {
+					console.log(e);
+					continue;
 				}
 			}
 		}

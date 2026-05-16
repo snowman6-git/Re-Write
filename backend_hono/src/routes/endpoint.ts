@@ -14,6 +14,13 @@ dotenv.config();
 const API_URL = process.env.API_URL;
 const API_KEY = process.env.API_KEY;
 
+interface ModelInfo {
+  id: string;
+  status?: {
+    value: string;
+  };
+}
+
 export async function models(c: Context) {
   let models_api = await axios.get(`${API_URL}/models`, {
     headers: {
@@ -22,7 +29,7 @@ export async function models(c: Context) {
     },
   });
   let models_api_data = models_api.data.data;
-  const reform_model_list = models_api_data.map(model => {
+  const reform_model_list = models_api_data.map((model: ModelInfo) => {
   // 1. 매핑 테이블에서 해당 모델용 정보를 가져옴
   const config = MODEL_DISPLAY_CONFIG[model.id];
   // 2. 새로운 객체를 반환 (이게 포인트!)
@@ -48,9 +55,8 @@ export async function chat(c: Context) {
   } else {
     thinking_tokens = 560;
   }
+  // 유저입력을 추가
   await chat_history_add(id, "user", chat);
-  let chat_history = await chat_history_load();
-  console.log(chat_history);
   const requestBody = {
     model: model,
     // Advance parameters
@@ -62,15 +68,12 @@ export async function chat(c: Context) {
     // streaming
     stream: true, // 반드시 true로 설정
     is_input: true,
-    // enable_thinking: true, 제대로 되는건지 모르겠음.
-    messages: chat_history
+    // 채팅기록을 불러옴, 이때 방금 막 추가한 메세지도 불러와 사용됌
+    messages: await chat_history_load()
 
       // { role: "user", content: `${chat}` },
       // { role: "user", content: `${chat} 유저의 입력입니다, 이는 유저의 행동, 혹은 C의 행동을 묘사하는 내용입니다.` },
   };
-
-  // requestBody.messages.push()
-
 
   const response = await fetch(`${API_URL}/v1/chat/completions`, { // 엔드포인트 확인
   method: "POST",
@@ -83,12 +86,78 @@ export async function chat(c: Context) {
     const reader = response.body?.getReader();
     if (!reader) return;
     const decoder = new TextDecoder();
+
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
+
       const chunk = decoder.decode(value);
-      // llama-server에서 오는 SSE 데이터를 그대로 프론트로 전달
-      await stream.write(chunk);
+			for (const line of chunk.split('\n')) {
+      if (line.startsWith('data: ') && line !== 'data: [DONE]') {
+        const jsonStr = line.slice(6); //6개로 썰어야 시작종료 태그가 된다고 함
+        const data = JSON.parse(jsonStr);
+        const content = data.choices[0]?.delta?.content || '';
+        await stream.write(content);
+      } else if (line.trim() === 'data: [DONE]') {
+      }
+      }
     }
   });
 }
+
+  // requestBody.messages.push()
+
+
+//   const response = await fetch(`${API_URL}/v1/chat/completions`, {
+//     method: "POST",
+//     headers: { "Content-Type": "application/json" },
+//     body: JSON.stringify(requestBody),
+//   });
+//   // 이건진짜 나중에 리팩토링 & 완벽하게 이해하기 필요할듯
+//   return streamText(c, async (stream) => {
+//     const reader = response.body?.getReader();
+//     if (!reader) return;
+
+//     const decoder = new TextDecoder();
+//     let fullReply = ""; // 완성본을 저장할 변수
+
+//     while (true) {
+//       const { done, value } = await reader.read();
+//       // 1. 네트워크 연결 자체가 끊겼을 때 (안전장치)
+//       // if (done) {
+//       //   await chat_history_add(id, "assistant", fullReply);
+//       //   break;
+//       // }
+
+//       const chunk = decoder.decode(value);
+      
+//       // 프론트엔드로 실시간 토스
+//       await stream.write(chunk);
+
+//       // 2. 텍스트 파싱해서 완성본 모으기
+//       const lines = chunk.split('\n');
+//       for (const line of lines) {
+//         // llama-server가 명시적으로 끝을 알리는 신호
+//         if (line.trim() === 'data: [DONE]') {
+//           await stream.write("data: [DONE]")
+//           await chat_history_add(id, "assistant", fullReply);
+//           break; 
+//         }
+
+//         if (line.startsWith('data: ')) {
+//           try {
+//             const jsonStr = line.slice(6);
+//             const data = JSON.parse(jsonStr);
+//             const content = data.choices[0]?.delta?.content || "";
+            
+//             // 한 글자씩 데이터 누적
+//             fullReply += content; 
+//           } catch (e) {
+//             // 빈 줄이거나 파싱 불가능한 데이터는 무시
+//             continue;
+//           }
+//         }
+//       }
+//     }
+//   });
+// }

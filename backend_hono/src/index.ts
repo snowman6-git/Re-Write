@@ -34,5 +34,6 @@ app.post("/auto_report/:type", auto_report);
 
 export default {
   port: 3000,
+  host: "0.0.0.0",
   fetch: app.fetch,
 };

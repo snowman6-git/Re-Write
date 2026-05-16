@@ -32,7 +32,7 @@
 	// primary key가 필요함, 아니면 같은 말은 같은 키로 인식해서 업데이트가 안됨
 	interface Msg {
 		id: string;
-		from: string;
+		sender: string;
 		content: string;
 	}
 	interface ModelInfo {
@@ -93,18 +93,24 @@
 		isModelResponding = true; // 모델이 응답 중임을 표시
 		// 1. 유저 메시지 추가
 		const currentInput = user_input;
-		MsgBox = [...MsgBox, { id:crypto.randomUUID(), from: 'user', content: currentInput }];
+		
+		let user_chat_id = crypto.randomUUID()
+		let ai_chat_id = crypto.randomUUID()
+		
+		MsgBox = [...MsgBox, { id: user_chat_id, sender: 'user', content: currentInput }];
 		user_input = '';
 
 		// 2. AI 메시지 공간 미리 생성 (빈 내용으로 추가)
 		// 이 시점에서 MsgBox의 마지막 인덱스가 AI의 메시지 위치가 됩니다.
-		MsgBox = [...MsgBox, { id:crypto.randomUUID(), from: 'Re:Write_AI', content: '' }];
+		MsgBox = [...MsgBox, { id: ai_chat_id, sender: 'assistant', content: '' }];
+		// 나중에 모델의 응답ID는 어떻게 넘길지 고려하기, ID생성을 백엔드에서 하고 프론트에서 로드만 하던가 < 그럼 챗 분류는? 차차해라
 		const aiMsgIndex = MsgBox.length - 1;
 		const response = await fetch(`${PUBLIC_API_URL}/chat`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(
-				{ 
+				{	
+					id: user_chat_id,
 					chat: currentInput, 
 					model: $selectedModel.id, 
 					custom_note: "IMG_LOGIC URL을 http://localhost:3000/img로 변경",
@@ -200,7 +206,7 @@
 	<div id="chat_body" bind:this={chat_body}>
 		{#each MsgBox as msg (msg.id)}
 			<!-- 잠깐만 구분선용으로 쓰기 -->
-			<div style="opacity: 0.5; font-size: 0.8rem; font-weight: bold;">[{msg.from}]</div>
+			<div style="opacity: 0.5; font-size: 0.8rem; font-weight: bold;">[{msg.sender}]</div>
 			{@html marked(DOMPurify.sanitize(msg.content))}
 			<!-- 비정제 HTML marked가 스타일링함 -->
 

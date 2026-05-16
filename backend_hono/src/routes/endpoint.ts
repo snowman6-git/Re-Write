@@ -6,8 +6,9 @@ import { Context } from "hono";
 import { streamText } from "hono/streaming";
 
 // 굳이 TS로 해야할지 고민하기
-import { system_prompt, assistant_prompt } from "../static/prompt";
 import { MODEL_DISPLAY_CONFIG } from "../static/model";
+
+import { chat_history_add, chat_history_load } from "./session";
 
 dotenv.config();
 const API_URL = process.env.API_URL;
@@ -38,7 +39,7 @@ export async function models(c: Context) {
 }
 
 export async function chat(c: Context) {
-  const { chat, model, custom_note, logic_plus } = await c.req.json();
+  const { id, chat, model, custom_note, logic_plus } = await c.req.json();
   
   // 초기화 하고 리턴에서 참조가능하게 상위변수 지정
   let thinking_tokens = 0
@@ -47,7 +48,9 @@ export async function chat(c: Context) {
   } else {
     thinking_tokens = 560;
   }
-  
+  await chat_history_add(id, "user", chat);
+  let chat_history = await chat_history_load();
+  console.log(chat_history);
   const requestBody = {
     model: model,
     // Advance parameters
@@ -60,12 +63,13 @@ export async function chat(c: Context) {
     stream: true, // 반드시 true로 설정
     is_input: true,
     // enable_thinking: true, 제대로 되는건지 모르겠음.
-    messages: [
-      { role: "system", content: `${system_prompt}\n${custom_note}` },
-      { role: "assistant", content: `${assistant_prompt}` },
-      { role: "user", content: `${chat} 유저의 입력입니다, 이는 유저의 행동, 혹은 C의 행동을 묘사하는 내용입니다.` },
-    ],
+    messages: chat_history
+
+      // { role: "user", content: `${chat}` },
+      // { role: "user", content: `${chat} 유저의 입력입니다, 이는 유저의 행동, 혹은 C의 행동을 묘사하는 내용입니다.` },
   };
+
+  // requestBody.messages.push()
 
 
   const response = await fetch(`${API_URL}/v1/chat/completions`, { // 엔드포인트 확인

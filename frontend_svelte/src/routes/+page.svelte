@@ -25,9 +25,9 @@
 	import HamMenu from '../components/HamMenu.svelte';
 	import ChatTools from '../components/ChatTools.svelte';
 	import { logic_plus } from '../api_options';
-
-	// 차차 엔브넣고 최적화 하기
-	const API_URL = 'http://localhost:3000';
+	
+	// 환경변수
+	import { PUBLIC_API_URL } from '$env/static/public';
 	
 	// primary key가 필요함, 아니면 같은 말은 같은 키로 인식해서 업데이트가 안됨
 	interface Msg {
@@ -49,7 +49,7 @@
 	let { isModelResponding = $bindable(false) } = $props<{ isModelResponding: boolean }>();
 	async function model_listup() {
         try {
-            let model_list_api = await axios.get(`${API_URL}/models`, { timeout: 5000 })
+            let model_list_api = await axios.get(`${PUBLIC_API_URL}/models`, { timeout: 5000 })
             model_list = model_list_api.data;
             // 로딩된 모델을 기본 선택값으로 설정(차후 소켓이든 뭐든 동적업데이트 < 아님 걍 챗 요청하고 돌아오는 응답으로 로드여부 확인 차피 1개만로드함)
 			// -> 로드된 모델 없으면 일단 리스트의 첫번째 모델로 설정, 그래도 없으면 NotFound
@@ -59,7 +59,7 @@
 			$selectedModel = 'NotFound';
             // 애초에 버튼이 비활되긴하지만 혹시 몰라서 모델 리스트에 실패 메시지라도 넣어줌
             model_list.push({ id: 'NotFound', name: '모델 리스트업 실패', desc: '서버에서 모델 정보를 받아오지 못했습니다.' } as ModelInfo);
-            axios.post(`${API_URL}/auto_report/try_catch`, {
+            axios.post(`${PUBLIC_API_URL}/auto_report/try_catch`, {
                 error: `모델 리스트업 실패: ${error}`,
                 timestamp: new Date().toISOString()
             }).catch((err) => {
@@ -100,7 +100,7 @@
 		// 이 시점에서 MsgBox의 마지막 인덱스가 AI의 메시지 위치가 됩니다.
 		MsgBox = [...MsgBox, { id:crypto.randomUUID(), from: 'Re:Write_AI', content: '' }];
 		const aiMsgIndex = MsgBox.length - 1;
-		const response = await fetch(`${API_URL}/chat`, {
+		const response = await fetch(`${PUBLIC_API_URL}/chat`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(
@@ -256,14 +256,14 @@
 		/* justify-content: space-around; */
 	}
 	#header_right, #header_left {
-        width: 100%; height: 100%;
+        width: 50dvw; height: 100%;
 		display: flex;
 		flex-direction: row;
 		align-items: center;
 		gap: 0.5rem;
 	}
     #title{
-        height: auto; width: 20rem;
+        height: auto; width: auto;
         text-overflow: ellipsis;
         white-space: nowrap;
         overflow: hidden;
@@ -277,7 +277,7 @@
         justify-content: start;
     }
 	#model_menu_btn {
-		width: 12rem; height: 2rem;
+		width: 100%; height: 2rem;
 		text-align: center;
 		text-wrap: nowrap;
 		overflow: hidden;

@@ -30,7 +30,7 @@ export async function models(c: Context) {
     id: model.id, // 모델명은 기존 id로 설정
     name: config?.aliases ?? model.id,
     desc: config?.desc ?? "설명 없음",
-    status: model.status.value, // 메모리에 올라왔는가, 없는경우도 있으니 ?? <
+    status: model.status?.value ?? "알 수 없음", // 메모리에 올라왔는가, 안나오는 경우도 있으니 status?넣어서 후처리
     hardware: config?.hardware ?? "권장사양없음"
   };
   });

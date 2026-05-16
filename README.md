@@ -17,6 +17,29 @@
 
 아이디어만 많고 실력이 조악해 코드 잘 짜시는 분들은 눈돌리시는걸 추천합니다.
 
+|Recommended LLM Serving Framework|Requirement Endpoint|
+|:-:|:-:|
+|[llama.cpp](https://github.com/ggml-org/llama.cpp)|[openai v1 endpoint](https://developers.openai.com/api/reference/overview)|
+
+
+권장 실행 인자
+```bash
+./build/bin/llama-server --models-dir [MODEL_PATH] \
+--host [HOST] \
+--port [PORT] \
+-ngl 999 \
+-fa on \
+-c 10240 \
+-rea on \
+--jinja \
+--models-max 1 \
+-np 1
+```
+
+
+
+
+
 ### 목표는 로컬ai or API사서 자급자족 가능한 셀프 호스팅 + 프롬프트 연습용 GUI만들기가 되겠습니다.
 
 업데이트/미리보기

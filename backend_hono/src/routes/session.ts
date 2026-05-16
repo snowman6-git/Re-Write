@@ -15,8 +15,8 @@ import * as dotenv from "dotenv";
 // `).run();
 
 let chat_history: Array<object> = [
-    { role: "system", content: `${system_prompt}` },
-    { role: "assistant", content: `${assistant_prompt}` },
+    // { role: "system", content: `${system_prompt}` },
+    // { role: "assistant", content: `${assistant_prompt}` },
 ]
 // 세션 관련 라우트들, 세션은 일단 간단하게 DB에 저장하는 형태로 구현, 나중에 Redis나 다른 스토리지로 변경 가능
 export async function chat_history_add(id: string, sender: string, content: string) {

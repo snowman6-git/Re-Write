@@ -21,6 +21,14 @@
 |:-:|:-:|
 |[llama.cpp](https://github.com/ggml-org/llama.cpp)|[openai v1 endpoint](https://developers.openai.com/api/reference/overview)|
 
+|계획중|개발중|사용가능|릴리즈|
+|:-:|:-:|:-:|:-:|
+|홈페이지 + 스토리 업/다운로드||||
+|RAG를 통한 스토리 장기진행간 설정유지||||
+|||세션과 이전대화기반 전개||
+||이미지 URL교체를 통한 유저 커스텀 스킨|||
+||||기본적인 대화기능<br>(전송, 자동 스크롤, 마크다운등)|
+||||리저닝, 스트림챗|
 
 권장 실행 인자
 ```bash

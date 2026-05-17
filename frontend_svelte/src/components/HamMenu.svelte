@@ -67,9 +67,9 @@
 		z-index: 999;
 		top: 0; right: 0;
 	}
-	@media (max-width: 900px) {
-    #side_menu {
-		width: 100dvw;
-    }
-  }
+	@media (orientation: portrait) {
+		#side_menu {
+			width: 100dvw;
+		}	
+	}
 </style>

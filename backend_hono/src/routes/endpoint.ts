@@ -70,9 +70,6 @@ export async function chat(c: Context) {
     is_input: true,
     // 채팅기록을 불러옴, 이때 방금 막 추가한 메세지도 불러와 사용됌
     messages: await chat_history_load()
-
-      // { role: "user", content: `${chat}` },
-      // { role: "user", content: `${chat} 유저의 입력입니다, 이는 유저의 행동, 혹은 C의 행동을 묘사하는 내용입니다.` },
   };
 
   const response = await fetch(`${API_URL}/v1/chat/completions`, { // 엔드포인트 확인
@@ -82,6 +79,7 @@ export async function chat(c: Context) {
   },
     body: JSON.stringify(requestBody),
   });
+  let llm_response_result = "";
   return streamText(c, async (stream) => {
     const reader = response.body?.getReader();
     if (!reader) return;
@@ -92,72 +90,26 @@ export async function chat(c: Context) {
       if (done) break;
 
       const chunk = decoder.decode(value);
-			for (const line of chunk.split('\n')) {
-      if (line.startsWith('data: ') && line !== 'data: [DONE]') {
+      for (const line of chunk.split('\n')) {
         const jsonStr = line.slice(6); //6개로 썰어야 시작종료 태그가 된다고 함
-        const data = JSON.parse(jsonStr);
-        const content = data.choices[0]?.delta?.content || '';
-        await stream.write(content);
-      } else if (line.trim() === 'data: [DONE]') {
-      }
+        
+        if (line.startsWith('data: ') && line.trim() !== 'data: [DONE]') {
+          const data = JSON.parse(jsonStr);
+          if (data.choices[0]?.finish_reason === 'stop') {
+            // let reasponse_info = {
+            //   tps: data.timings.predicted_per_second,
+            //   start_in: data.timings.predicted_ms,
+            // }
+            // await stream.write(``);
+          } else {
+            const content = data.choices[0]?.delta?.content || '';
+            llm_response_result += content;
+            await stream.write(content);
+          }
+        }
       }
     }
+    // 스트림데이터 수신 종료후, LLM의 최종응답을 저장
+    chat_history_add(id, "assistant", llm_response_result);
   });
 }
-
-  // requestBody.messages.push()
-
-
-//   const response = await fetch(`${API_URL}/v1/chat/completions`, {
-//     method: "POST",
-//     headers: { "Content-Type": "application/json" },
-//     body: JSON.stringify(requestBody),
-//   });
-//   // 이건진짜 나중에 리팩토링 & 완벽하게 이해하기 필요할듯
-//   return streamText(c, async (stream) => {
-//     const reader = response.body?.getReader();
-//     if (!reader) return;
-
-//     const decoder = new TextDecoder();
-//     let fullReply = ""; // 완성본을 저장할 변수
-
-//     while (true) {
-//       const { done, value } = await reader.read();
-//       // 1. 네트워크 연결 자체가 끊겼을 때 (안전장치)
-//       // if (done) {
-//       //   await chat_history_add(id, "assistant", fullReply);
-//       //   break;
-//       // }
-
-//       const chunk = decoder.decode(value);
-      
-//       // 프론트엔드로 실시간 토스
-//       await stream.write(chunk);
-
-//       // 2. 텍스트 파싱해서 완성본 모으기
-//       const lines = chunk.split('\n');
-//       for (const line of lines) {
-//         // llama-server가 명시적으로 끝을 알리는 신호
-//         if (line.trim() === 'data: [DONE]') {
-//           await stream.write("data: [DONE]")
-//           await chat_history_add(id, "assistant", fullReply);
-//           break; 
-//         }
-
-//         if (line.startsWith('data: ')) {
-//           try {
-//             const jsonStr = line.slice(6);
-//             const data = JSON.parse(jsonStr);
-//             const content = data.choices[0]?.delta?.content || "";
-            
-//             // 한 글자씩 데이터 누적
-//             fullReply += content; 
-//           } catch (e) {
-//             // 빈 줄이거나 파싱 불가능한 데이터는 무시
-//             continue;
-//           }
-//         }
-//       }
-//     }
-//   });
-// }

@@ -56,7 +56,7 @@
 			$selectedModel = model_list.find((model) => model.status === 'loaded') ?? model_list[0]
 			$isModel_loaded = true;
     } catch (error) {
-			$selectedModel = 'NotFound';
+			// $selectedModel = 'NotFound';
             // 애초에 버튼이 비활되긴하지만 혹시 몰라서 모델 리스트에 실패 메시지라도 넣어줌
             model_list.push({ id: 'NotFound', name: '모델 리스트업 실패', desc: '서버에서 모델 정보를 받아오지 못했습니다.' } as ModelInfo);
             axios.post(`${PUBLIC_API_URL}/auto_report/try_catch`, {
@@ -93,9 +93,10 @@
 		isModelResponding = true; // 모델이 응답 중임을 표시
 		// 1. 유저 메시지 추가
 		const currentInput = user_input;
-		
-		let user_chat_id = crypto.randomUUID()
-		let ai_chat_id = crypto.randomUUID()
+
+		//crypto.randomUUID() 이유는 몰라도 개발자 모드 호스팅으로 여는순간 안됌, 임시로 랜덤숫자
+		let user_chat_id = (Math.floor(Math.random() * 1000) + 1).toString();
+		let ai_chat_id = (Math.floor(Math.random() * 1000) + 1).toString();
 		
 		MsgBox = [...MsgBox, { id: user_chat_id, sender: 'user', content: currentInput }];
 		user_input = '';
@@ -114,7 +115,7 @@
 					chat: currentInput, 
 					model: $selectedModel.id,
 					// 나중에 사이드메뉴에서 커스텀노트, 이미지 URL같이 다른 옵션 추가하기
-					custom_note: "IMG_LOGIC URL을 http://localhost:3000/img로 변경",
+					custom_note: "",
 					logic_plus: $logic_plus
 				})
 		});
@@ -129,6 +130,7 @@
 			if (done) break;
 			for (const line of decoder.decode(value)) {
 				try {
+					// 응답정보는 나중에 추가할거면 하고 아님 말고 (EX TPS, Total_Tokens, Start_in)
 					MsgBox[aiMsgIndex].content += line;
 					MsgBox = [...MsgBox];
 				} catch (e) {
@@ -282,8 +284,8 @@
 		text-overflow: ellipsis;
 	}
 	#chat_input {
-		width: 80%;
-		height: 20rem;
+		width: 40%;
+		height: 20dvh;
 		display: flex;
 		flex-direction: column;
 		justify-content: space-around;
@@ -307,6 +309,9 @@
         z-index: 998;
 	}
 	@media (max-width: 900px) {
+		:global(#header) {
+			margin-top: 2rem;
+		}
 		#chat_input {
 			width: 90dvw;
 		}

@@ -40,6 +40,7 @@
 		opacity: 1;
 	}
 	#logic_plus_label {
+		width: 7rem;
 		display: flex;
 		align-items: center;
 		gap: 0.25rem;

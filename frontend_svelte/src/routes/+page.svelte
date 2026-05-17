@@ -156,8 +156,13 @@
 <!-- 줌(아줌마아님)밴 -->
 <meta
 	name="viewport"
-	content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+	content="width=device-width, 
+	initial-scale=1.0, 
+	maximum-scale=1.0, 
+	user-scalable=no,
+	"
 />
+
 
 <!-- 어디든엔터라면채팅을넣어 -->
 <svelte:window on:keydown={handleGlobalKeyDown} />
@@ -170,7 +175,6 @@
             <div id="title">TODO리스트는아직인가요?</div>
         </div>
 		<div id="header_right">
-			<div>
 				{#await model_listup()}
 					<button id="model_menu_btn" disabled>Loading...</button>
 				{:then}
@@ -186,7 +190,6 @@
 					<ModelList {model_list} />
 				{/if}
 
-			</div>
             <HamMenu />
 
             <!-- <button id="side_menu" onclick={alert("menu")}></button> -->
@@ -248,6 +251,7 @@
 		border-bottom: 0.1rem solid gray;
 		display: flex;
 		align-items: center;
+		gap: 0.5rem;
 		/* justify-content: space-around; */
 	}
 	#header_right, #header_left {
@@ -273,6 +277,7 @@
     }
 	#model_menu_btn {
 		width: 100%; height: 2rem;
+		max-width: 10rem;
 		text-align: center;
 		text-wrap: nowrap;
 		overflow: hidden;
@@ -284,7 +289,7 @@
 		text-overflow: ellipsis;
 	}
 	#chat_input {
-		width: 40%;
+		width: 60dvw;
 		height: 20dvh;
 		display: flex;
 		flex-direction: column;
@@ -308,12 +313,13 @@
 		color: white;
         z-index: 998;
 	}
-	@media (max-width: 900px) {
-		:global(#header) {
-			margin-top: 2rem;
-		}
+	@media (orientation: portrait) {
 		#chat_input {
 			width: 90dvw;
+			margin-bottom: 0;
+			border-bottom: 0;
+			border-radius: 0.5rem 0.5rem 0 0;
+			bottom: 0;
 		}
 	}
 </style>

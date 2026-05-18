@@ -22,10 +22,12 @@ app.use(
 );
 app.use("/*", serveStatic({ root: "./public" }));
 
-// GET
+// GET 나중에는 지워야함, 이건 ㄹㅇ 중간자 서버역임, 아님 옵션을 루트에서도 수정가능하게 하던가
 app.get("/", (c) => {
   return c.text("Hello Hono!");
 });
+
+
 app.get("/models", models);
 
 // POST

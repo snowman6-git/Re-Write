@@ -47,7 +47,6 @@ export async function models(c: Context) {
 
 export async function chat(c: Context) {
   const { id, chat, model, custom_note, logic_plus } = await c.req.json();
-  
   // 초기화 하고 리턴에서 참조가능하게 상위변수 지정
   let thinking_tokens = 0
   if (logic_plus == false) {

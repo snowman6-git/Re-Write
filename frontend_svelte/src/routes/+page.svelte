@@ -28,6 +28,7 @@
 	
 	// 환경변수
 	import { PUBLIC_API_URL } from '$env/static/public';
+
 	
 	// primary key가 필요함, 아니면 같은 말은 같은 키로 인식해서 업데이트가 안됨
 	interface Msg {
@@ -247,7 +248,7 @@
 		/* justify-content: space-around; */
 	}
 	#header_right, #header_left {
-        width: 50dvw; height: 100%;
+        width: 50%; height: 100%;
 		display: flex;
 		flex-direction: row;
 		align-items: center;
@@ -268,7 +269,7 @@
         justify-content: start;
     }
 	#model_menu_btn {
-		width: 100%; height: 2rem;
+		width: 80%; height: 2rem;
 		max-width: 10rem;
 		text-align: center;
 		text-wrap: nowrap;

@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "ReWrite",
+  "productName": "Rewrite",
   "version": "0.1.0",
   "identifier": "com.snowman6.rewrite",
   "build": {
@@ -13,8 +13,8 @@
     "windows": [
       {
         "title": "Re:Write",
-        "width":  900,
-        "height": 1950
+        "width":  1080,
+        "height": 1920
       }
     ],
     "security": {

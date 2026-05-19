@@ -78,6 +78,17 @@ export async function chat(c: Context) {
   },
     body: JSON.stringify(requestBody),
   });
+  console.log(response.status)
+  console.log(response.statusText)
+  console.log(response.status)
+
+  if (response.status == 204){
+    return c.json({
+      status: response.status,
+      description: "서버에서 응답이 돌아오지않음."
+    })
+  }
+
   let llm_response_result = "";
   return streamText(c, async (stream) => {
     const reader = response.body?.getReader();

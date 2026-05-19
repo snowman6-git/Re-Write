@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "Re:Write",
+        "title": "Rewrite",
         "width":  1080,
         "height": 1920
       }

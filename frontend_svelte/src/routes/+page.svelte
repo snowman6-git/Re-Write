@@ -277,35 +277,10 @@
 		background-color: transparent;
 		border: 0.2rem solid grey;
 		padding: 0.25rem;
-		color: white;
 		font-size: 1rem;
 		text-overflow: ellipsis;
 	}
-	#chat_input {
-		width: 60dvw;
-		height: 20dvh;
-		display: flex;
-		flex-direction: column;
-		justify-content: space-around;
-		border: 0.2rem solid gray;
-		border-radius: 0.5rem;
-		margin-bottom: 2rem;
-		/* padding: 0.25rem 1rem 0.25rem 1rem; */
-		padding: 0.5em;
-		background-color: #252525;
-	}
-	#user_input {
-		resize: none;
-		font-family: 'NxMaple';
-		width: 100%;
-		height: 100%;
-		background-color: transparent;
-		border: none;
-		outline: none;
-		font-size: 1.2rem;
-		color: white;
-        z-index: 998;
-	}
+
 	@media (orientation: portrait) {
 		#chat_input {
 			width: 90dvw;

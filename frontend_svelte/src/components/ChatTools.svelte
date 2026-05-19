@@ -15,7 +15,7 @@
 	<!-- 리턴이 없는 보이드 함수라 이런식 -->
 
 	<!-- 유저인풋도 있고, 모델이 응답도 안할때 활성화  -->
-	<button class:active={user_input.trim() !== '' && !isModelResponding} disabled={!isModelResponding} title="send" id="send_btn" onclick={() => chat()}></button>
+	<button class:active={user_input.trim() !== '' && !isModelResponding} disabled={isModelResponding} title="send" id="send_btn" onclick={() => chat()}></button>
 </div>
 
 <style>

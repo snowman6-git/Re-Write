@@ -11,7 +11,7 @@ import { MODEL_DISPLAY_CONFIG } from "../static/model";
 import { chat_history_add, chat_history_load } from "./session";
 
 dotenv.config();
-const API_URL = process.env.API_URL;
+const LLM_API_URL = process.env.LLM_API_URL;
 const API_KEY = process.env.API_KEY;
 
 interface ModelInfo {
@@ -21,15 +21,34 @@ interface ModelInfo {
   };
 }
 
+interface ChatInfo {
+  sender: string;
+  content: string;
+}
+
+// 차후 세션의 분리와 함께 해당 함수의 세션 분간용 인자를 통해 수정
+export async function chat_listup(c: Context) {
+  let load_chat_history = await chat_history_load()
+  const chat_list = load_chat_history.slice(2).map((chat: ChatInfo) => {
+  return {
+    // 테스트를 위해 임시 생성, 프/백 둘다 다른값으로 계속 생성중이니 알고 있을것
+    id: crypto.randomUUID(),
+    ...chat,
+  };
+  });
+
+  return c.json(chat_list)
+}
+
 export async function models(c: Context) {
-  let models_api = await axios.get(`${API_URL}/models`, {
+  let models_api = await axios.get(`${LLM_API_URL}/models`, {
     headers: {
       Authorization: `Bearer ${API_KEY}`,
       "Content-Type": "application/json",
     },
   });
   let models_api_data = models_api.data.data;
-  const reform_model_list = models_api_data.map((model: ModelInfo) => {
+  const chat_list = models_api_data.map((model: ModelInfo) => {
   // 1. 매핑 테이블에서 해당 모델용 정보를 가져옴
   const config = MODEL_DISPLAY_CONFIG[model.id];
   // 2. 새로운 객체를 반환 (이게 포인트!)
@@ -42,7 +61,7 @@ export async function models(c: Context) {
     hardware: config?.hardware ?? "권장사양없음"
   };
   });
-  return c.json(reform_model_list);
+  return c.json(chat_list);
 }
 
 export async function chat(c: Context) {
@@ -71,23 +90,14 @@ export async function chat(c: Context) {
     messages: await chat_history_load()
   };
 
-  const response = await fetch(`${API_URL}/v1/chat/completions`, { // 엔드포인트 확인
+  const response = await fetch(`${LLM_API_URL}/v1/chat/completions`, { // 엔드포인트 확인
   method: "POST",
   headers: {
     "Content-Type": "application/json",
   },
     body: JSON.stringify(requestBody),
-  });
-  console.log(response.status)
-  console.log(response.statusText)
-  console.log(response.status)
+  })
 
-  if (response.status == 204){
-    return c.json({
-      status: response.status,
-      description: "서버에서 응답이 돌아오지않음."
-    })
-  }
 
   let llm_response_result = "";
   return streamText(c, async (stream) => {

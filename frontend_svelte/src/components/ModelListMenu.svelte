@@ -6,9 +6,10 @@
 		model_list: object;
 	}>();
 	let menuHeight = $state(0);
+
 </script>
 
-<!-- 덜컹효과 = cubicOut -->
+<!-- 나중에 메뉴열때마다 리스트업 다시하게 만들기 -->
 <div id="model_menu" 
 	// 모델 메뉴의 높이를 측정하여 애니메이션에 활용
 	bind:clientHeight={menuHeight}
@@ -19,6 +20,7 @@
 			<ModelBlock {model} />
 		{/each}
 	</div>
+
 </div>
 
 <style>

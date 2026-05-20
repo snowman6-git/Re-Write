@@ -1,11 +1,12 @@
 import axios from "axios";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import { models, chat } from "./routes/endpoint";
+import { models, chat, chat_listup } from "./routes/endpoint";
 
 // 프론트 에러를 동의 없이 수집해도 되는지 알아보기
 import { auto_report } from "./routes/collect";
 import { serveStatic } from "hono/bun";
+import { system_prompt } from "./routes/session";
 
 const app = new Hono();
 app.use(
@@ -20,7 +21,7 @@ app.use(
     credentials: true,
   }),
 );
-app.use("/*", serveStatic({ root: "./public" }));
+app.use("/img/*", serveStatic({ root: "./public" }));
 
 // GET 나중에는 지워야함, 이건 ㄹㅇ 중간자 서버역임, 아님 옵션을 루트에서도 수정가능하게 하던가
 app.get("/", (c) => {
@@ -28,7 +29,11 @@ app.get("/", (c) => {
 });
 
 
+// GET
+app.get("/chat_listup", chat_listup)
 app.get("/models", models);
+app.get("/world_edit", system_prompt);
+
 
 // POST
 app.post("/chat", chat);

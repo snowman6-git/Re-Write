@@ -19,7 +19,7 @@
 	// import { markdownContent } from '../../static/markdown.ts';
 
 	// 컴포넌트
-	import ModelList from '../components/ModelList.svelte';
+	import ModelListMenu from '../components/ModelListMenu.svelte';
 	import BackBtn from '../components/BackBtn.svelte';
 	import { tick } from 'svelte';
 	import HamMenu from '../components/HamMenu.svelte';
@@ -46,6 +46,16 @@
 	let user_input = $state<string>('');
 	let MsgBox: Msg[] = $state([]);
 
+
+	async function startup(){
+		let chat_listup = await axios.get(`${PUBLIC_API_URL}/chat_listup`, { withCredentials: true })
+		let chat_list = chat_listup.data
+		if (chat_list !== ""){
+			MsgBox = chat_listup.data
+		}
+	}
+	startup()
+	
 	// 스토어는 이제 구식이라네.
 	let { isModelResponding = $bindable(false) } = $props<{ isModelResponding: boolean }>();
 	async function model_listup() {
@@ -180,7 +190,7 @@
 					class:disable={$isModel_menu_open}></button
 				>
 				{#if $isModel_menu_open}
-					<ModelList {model_list} />
+					<ModelListMenu {model_list} {model_listup} />
 				{/if}
 
             <HamMenu />

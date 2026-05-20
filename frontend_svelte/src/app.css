@@ -15,10 +15,7 @@ html {
 	min-height: 100dvh;
 	max-width: 100dvw;
 	max-height: 100dvh;
-
-	font-family: 'NxMaple';
 	background-color: black;
-
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
@@ -42,7 +39,6 @@ html {
 }
 #user_input {
 	resize: none;
-	font-family: 'NxMaple';
 	width: 100%;
 	height: 100%;
 	background-color: transparent;
@@ -55,10 +51,10 @@ html {
 * {
 	box-sizing: border-box;
 	color: white;
+	font-family: 'NxMaple';
 }
 
 button {
-	font-family: 'NxMaple';
 	appearance: none;
 	border: none;
 	outline: none;

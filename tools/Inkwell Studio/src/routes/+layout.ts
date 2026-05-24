@@ -4,3 +4,4 @@
 // See: https://v2.tauri.app/start/frontend/sveltekit/ for more info
 // 타우리는 꺼야함 (서버가 없는데 서사레를 어캐하죠?)
 export const ssr = false;
+import "../app.css"

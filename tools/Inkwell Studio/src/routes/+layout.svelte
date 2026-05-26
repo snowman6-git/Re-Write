@@ -3,14 +3,15 @@
 </script>
 
 
-<div id="main">
+<div id="container">
     <nav>
-        <a class="head_menu">프로젝트</a>
+        <a class="head_menu" href="/">홈</a>
         <a class="head_menu">설정</a>
     </nav>
-    <div id="view">
+    
+    <main id="main-content">
         {@render children()}
-    </div>
+    </main>
 </div>
 
 <style>
@@ -25,17 +26,18 @@
         height: 100%;
         display: flex;
         align-items: center;
+        text-decoration: none;
     }
     .head_menu:hover{
         background-color: gray;
     }
-
-    #main, #view{ width: 100dvw; height: 100dvh; }
-    #main{
+    #container{
         display: flex;
         flex-direction: column;
-        align-items: center; justify-content: center;
+        min-height: 100dvh;
+        height: 100vh;
     }
-    #view{
+    #main-content{
+        flex: 1;
     }
 </style>
